@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Variables */
+:root {
+    --deep-nordic-blue: #1a2333;
+    --asgard-gold: #ffd700;
+    --bifrost-teal: #40E0D0;
+    --mystic-purple: #9370DB;
+    --ice-blue: #A5D8FF;
+    --rune-stone: #2a3142;
+    --frost-white: #e6f1ff;
+}
+
+@layer base {
+    body {
+        @apply bg-deep-nordic-blue text-frost-white font-sans m-0 p-0;
+    }
+
+    header, footer {
+        @apply relative bg-norse-pattern bg-cover bg-center;
+    }
+
+    header::before, footer::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-r from-deep-nordic-blue/70 to-rune-stone/70;
+    }
+
+    header *, footer * {
+        @apply relative z-10;
+    }
+
+    a {
+        @apply text-bifrost-teal no-underline mx-2.5 transition-colors duration-300;
+    }
+
+    a:hover {
+        @apply text-asgard-gold no-underline;
+        text-shadow: 0 0 8px var(--asgard-gold);
+    }
+
+    .container {
+        @apply max-w-7xl mx-auto px-4;
+    }
+
+    h1, h2 {
+        @apply text-asgard-gold;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+}
+
+@layer components {
+    .glow-text {
+        text-shadow: 0 0 10px var(--bifrost-teal);
+    }
+
+    .norse-border {
+        @apply border-2 border-asgard-gold;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+
+    .content-box {
+        @apply bg-rune-stone/80 border border-bifrost-teal rounded p-4 my-4;
+        box-shadow: 0 0 20px rgba(64, 224, 208, 0.2);
+    }
+}
+
+/* Floating Runes Styles */
+.rune {
+    @apply absolute text-3xl text-asgard-gold opacity-100;
+}
+
+.float-animation-1 {
+    animation: float1 6s ease-in-out infinite;
+}
+
+.float-animation-2 {
+    animation: float2 8s ease-in-out infinite;
+}
+
+.float-animation-3 {
+    animation: float3 7s ease-in-out infinite;
+}
