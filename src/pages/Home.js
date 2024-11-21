@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook
 import Shield from '../components/Shield';
 
 const TransitionText = ({ runic, english, className = "" }) => {
@@ -13,20 +14,20 @@ const TransitionText = ({ runic, english, className = "" }) => {
 
     return (
         <div className={`relative ${className}`}>
-      <span
-          className={`absolute top-0 left-0 right-0 transition-all duration-1000 ${
-              showRunic ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-      >
-        {runic}
-      </span>
+            <span
+                className={`absolute top-0 left-0 right-0 transition-all duration-1000 ${
+                    showRunic ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+                }`}
+            >
+                {runic}
+            </span>
             <span
                 className={`absolute top-0 left-0 right-0 transition-all duration-1000 ${
                     showRunic ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
                 }`}
             >
-        {english}
-      </span>
+                {english}
+            </span>
             <span className="opacity-0">{english}</span>
         </div>
     );
@@ -67,7 +68,11 @@ const ShieldTitle = ({ runic, english }) => (
 );
 
 const Home = () => {
-    const [isConnecting, setIsConnecting] = useState(false);
+    const navigate = useNavigate(); // Initialize the navigate function
+
+    const handleBeginPathClick = () => {
+        navigate('/dashboard'); // Navigate to the Dashboard route
+    };
 
     return (
         <div className="min-h-screen bg-deep-nordic-blue">
@@ -93,7 +98,7 @@ const Home = () => {
                             runic="ᛒᛖᚷᛁᚾ ᛃᛟᚢᚱ ᛈᚨᚦ"
                             english="BEGIN YOUR PATH"
                             variant="primary"
-                            onClick={() => setIsConnecting(true)}
+                            onClick={handleBeginPathClick} // Navigate on click
                         />
                         <RunicButton
                             runic="ᛚᛖᚨᚱᚾ ᚦᛖ ᛋᚨᚷᚨᛋ"
