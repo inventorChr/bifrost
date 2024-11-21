@@ -19,7 +19,7 @@
     }
 
     header, footer {
-        @apply relative bg-norse-pattern bg-cover bg-center;
+        @apply relative bg-cover bg-center;
     }
 
     header::before, footer::before {
@@ -63,6 +63,16 @@
     .content-box {
         @apply bg-rune-stone/80 border border-bifrost-teal rounded p-4 my-4;
         box-shadow: 0 0 20px rgba(64, 224, 208, 0.2);
+    }
+
+    .lazy-background {
+        @apply relative;
+        transition: background-image 0.3s ease-in-out;
+    }
+
+    .lazy-background.loaded {
+        background-image: url('./assets/optimized/viking-background.webp');
+        @apply bg-cover bg-center;
     }
 }
 

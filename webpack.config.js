@@ -5,8 +5,23 @@ module.exports = {
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js',
-        publicPath: '/'
+        filename: '[name].[contenthash].js',
+        chunkFilename: '[name].[contenthash].js',
+        publicPath: '/',
+        clean: true
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+            minSize: 20000,
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all',
+                }
+            }
+        }
     },
     module: {
         rules: [
@@ -15,6 +30,9 @@ module.exports = {
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
+                    options: {
+                        cacheDirectory: true
+                    }
                 },
             },
             {
@@ -26,8 +44,16 @@ module.exports = {
                 ],
             },
             {
-                test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
-                type: 'asset/resource',
+                test: /\.(webp|png|svg|jpg|jpeg|gif)$/i,
+                type: 'asset',
+                parser: {
+                    dataUrlCondition: {
+                        maxSize: 8 * 1024 // 8kb
+                    }
+                },
+                generator: {
+                    filename: 'images/[name].[hash][ext]'
+                }
             }
         ],
     },
@@ -35,10 +61,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/index.html',
             favicon: './public/viking.png'
-        }),
+        })
     ],
     devServer: {
         static: './dist',
-        historyApiFallback: true
-    },
+        historyApiFallback: true,
+        hot: true
+    }
 };

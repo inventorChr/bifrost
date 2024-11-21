@@ -17,9 +17,6 @@ module.exports = {
         'rune-stone': '#2a3142',
         'frost-white': '#e6f1ff',
       },
-      backgroundImage: {
-        'norse-pattern': "url('../src/assets/viking-background.webp')"
-      },
       keyframes: {
         float1: {
           '0%': { transform: 'translate(0, 0)' },

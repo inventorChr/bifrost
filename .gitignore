@@ -2,3 +2,4 @@
 /.idea
 /cypress
 /coverage
+/dist

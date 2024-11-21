@@ -1,29 +1,25 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Dashboard from './pages/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
-import favicon from '../public/viking.png';  // Add this import
 
-// Set favicon programmatically
-const link = document.createElement('link');
-link.rel = 'icon';
-link.type = 'image/png';
-link.href = favicon;
-document.head.appendChild(link);
+// Lazy load route components
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 const App = () => (
     <ErrorBoundary>
         <Router>
             <Header />
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-            </Routes>
+            <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                </Routes>
+            </Suspense>
             <Footer />
         </Router>
     </ErrorBoundary>
