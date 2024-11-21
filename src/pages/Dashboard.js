@@ -4,9 +4,9 @@ import Rune from '../components/Rune';
 
 const Dashboard = () => (
     <div className="container mx-auto px-4 py-8">
-        <Shield title="About Bifrost" variant="gold">
+        <Shield title="About Bifröst" variant="gold">
             <p className="mb-6">
-                Viking Crypto blends the honor and strength of Viking traditions with
+                Bifröst blends the honor and strength of Viking traditions with
                 cutting-edge cryptocurrency technology. Our platform serves as your bridge
                 between the ancient wisdom of wealth management and modern digital assets.
             </p>

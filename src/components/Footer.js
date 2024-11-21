@@ -8,7 +8,7 @@ const Footer = () => (
         borderTop: '1px solid var(--bifrost-teal)'
     }}>
         <p style={{ color: 'var(--frost-white)' }}>
-            © 2024 Bifrost • Bridge Between Realms
+            © 2024 Bifröst • Bridge Between Realms
         </p>
     </footer>
 );
