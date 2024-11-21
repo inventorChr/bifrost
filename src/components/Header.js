@@ -1,78 +1,106 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+const TransitionText = ({ runic, english, className = "" }) => {
+    const [showRunic, setShowRunic] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowRunic(false);
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, []);
+
+    return (
+        <div className={`relative ${className}`}>
+            <span
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full transition-all duration-1000 ${
+                    showRunic ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+                }`}
+            >
+                {runic}
+            </span>
+            <span
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full transition-all duration-1000 ${
+                    showRunic ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+                }`}
+            >
+                {english}
+            </span>
+            <span className="opacity-0">{english}</span>
+        </div>
+    );
+};
+
+const NavLink = ({ to, runic, english }) => (
+    <Link
+        to={to}
+        className="group relative flex items-center justify-center w-32 h-12 text-center px-4 py-2"
+    >
+        <TransitionText
+            runic={runic}
+            english={english}
+            className="text-frost-white group-hover:text-asgard-gold tracking-widest transition-colors duration-300"
+        />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-asgard-gold group-hover:w-full transition-all duration-300" />
+    </Link>
+);
+
+const FloatingRune = ({ children, className, delay = "0s" }) => (
+    <div
+        className={`absolute text-3xl text-asgard-gold opacity-100 ${className}`}
+        style={{ animationDelay: delay }}
+    >
+        {children}
+    </div>
+);
 
 const Header = () => (
     <header className="relative py-8 px-4 overflow-hidden min-h-[200px]">
-        {/* Floating Runes Container */}
         <div className="absolute inset-0 pointer-events-none">
-            {/* Top row runes */}
-            <div className="absolute text-3xl text-asgard-gold top-[10%] left-[15%] opacity-100 animate-float-1">ᚨ</div>
-            <div className="absolute text-3xl text-asgard-gold top-[5%] right-[25%] opacity-100 animate-float-2"
-                 style={{ animationDelay: '2s' }}>ᚱ</div>
-            <div className="absolute text-3xl text-asgard-gold top-[8%] left-[40%] opacity-100 animate-float-3"
-                 style={{ animationDelay: '1s' }}>ᚦ</div>
-
-            {/* Middle row runes */}
-            <div className="absolute text-4xl text-asgard-gold top-[30%] left-[20%] opacity-100 animate-float-1"
-                 style={{ animationDelay: '1.5s' }}>⚔️</div>
-            <div className="absolute text-3xl text-asgard-gold top-[35%] right-[15%] opacity-100 animate-float-2"
-                 style={{ animationDelay: '3s' }}>ᛟ</div>
-            <div className="absolute text-3xl text-asgard-gold top-[40%] left-[35%] opacity-100 animate-float-3"
-                 style={{ animationDelay: '2.5s' }}>ᚺ</div>
-
-            {/* Bottom row runes */}
-            <div className="absolute text-3xl text-asgard-gold bottom-[15%] left-[25%] opacity-100 animate-float-1"
-                 style={{ animationDelay: '0.5s' }}>ᚾ</div>
-            <div className="absolute text-3xl text-asgard-gold bottom-[20%] right-[30%] opacity-100 animate-float-2"
-                 style={{ animationDelay: '1.8s' }}>ᛈ</div>
-            <div className="absolute text-4xl text-asgard-gold bottom-[25%] left-[45%] opacity-100 animate-float-3"
-                 style={{ animationDelay: '3.5s' }}>⚡</div>
+            <FloatingRune className="top-[10%] left-[15%] animate-float-1">ᚱ</FloatingRune>
+            <FloatingRune className="top-[5%] right-[25%] animate-float-2" delay="2s">ᚢ</FloatingRune>
+            <FloatingRune className="top-[8%] left-[40%] animate-float-3" delay="1s">ᚾ</FloatingRune>
+            <FloatingRune className="top-[30%] left-[20%] text-4xl animate-float-1" delay="1.5s">⛨</FloatingRune>
+            <FloatingRune className="top-[35%] right-[15%] animate-float-2" delay="3s">ᛋ</FloatingRune>
+            <FloatingRune className="top-[40%] left-[35%] animate-float-3" delay="2.5s">ᚲ</FloatingRune>
+            <FloatingRune className="bottom-[15%] left-[25%] animate-float-1" delay="0.5s">ᚱ</FloatingRune>
+            <FloatingRune className="bottom-[20%] right-[30%] animate-float-2" delay="1.8s">ᛁ</FloatingRune>
+            <FloatingRune className="bottom-[25%] left-[45%] animate-float-3" delay="3.5s">ᚾ</FloatingRune>
         </div>
 
-        {/* Rest of the header content */}
         <div className="relative z-10">
-            {/* Title Container */}
-            <div className="relative">
-                <h1 className="font-bold text-center mb-0">
-            <span className="relative inline-block text-4xl md:text-5xl lg:text-6xl tracking-[0.2em]
-                        text-transparent bg-clip-text bg-gradient-to-b from-asgard-gold via-asgard-gold to-bifrost-teal
-                        animate-glow">
-                BIFRÖST
-                <span className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-b from-asgard-gold to-bifrost-teal blur-sm animate-glow-layer-1"></span>
-                <span className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-b from-asgard-gold to-bifrost-teal blur-md animate-glow-layer-2"></span>
-            </span>
+            <div className="relative text-center mb-8">
+                <h1 className="inline-block font-bold mb-0">
+                    <div
+                        className="relative text-4xl md:text-5xl lg:text-6xl tracking-[0.2em] h-[1.5em] text-center font-bold text-asgard-gold"
+                        style={{
+                            textShadow: "0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #B8860B, 0 0 40px #B8860B",
+                        }}
+                    >
+                        <TransitionText
+                            runic="ᚱᚢᚾᛋᚲᚱᛁᚾ"
+                            english="RÚNSKRIN"
+                            className="text-center font-bold"
+                        />
+                    </div>
                 </h1>
 
-                <div className="absolute left-1/2 -translate-x-1/2 w-64 h-0.5 animate-rune-glow mt-2">
-                    <div className="h-full bg-gradient-to-r from-transparent via-asgard-gold to-transparent" />
+                <div className="absolute left-1/2 -translate-x-1/2 w-64 h-0.5 mt-2">
+                    <div className="h-full bg-gradient-to-r from-transparent via-asgard-gold to-transparent animate-pulse" />
                 </div>
             </div>
 
+            <nav className="relative mt-12 py-4 flex justify-center items-center gap-8">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-px bg-gradient-to-r from-transparent to-asgard-gold animate-pulse" />
 
-            {/* Navigation */}
-            <nav className="relative mt-8 py-4 flex justify-center items-center gap-8">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-px bg-gradient-to-r from-transparent to-asgard-gold animate-rune-glow" />
+                <div className="flex items-center justify-center">
+                    <NavLink to="/" runic="ᚻᚨᛚᛚ" english="HOME" />
+                    <span className="text-asgard-gold animate-pulse">•</span>
+                    <NavLink to="/dashboard" runic="ᚹᚨᚢᛚᛏ" english="VAULT" />
+                </div>
 
-                <Link to="/" className="text-frost-white hover:text-asgard-gold transition-all duration-300 tracking-widest relative group">
-                    <span className="relative z-10 group-hover:animate-glow-text">HOME</span>
-                    <div className="absolute -bottom-1 left-0 w-0 h-px bg-asgard-gold group-hover:w-full transition-all duration-300" />
-                </Link>
-
-                <span className="text-asgard-gold animate-rune-glow">•</span>
-
-                <Link to="/about" className="text-frost-white hover:text-asgard-gold transition-all duration-300 tracking-widest relative group">
-                    <span className="relative z-10 group-hover:animate-glow-text">ABOUT</span>
-                    <div className="absolute -bottom-1 left-0 w-0 h-px bg-asgard-gold group-hover:w-full transition-all duration-300" />
-                </Link>
-
-                <span className="text-asgard-gold animate-rune-glow">•</span>
-
-                <Link to="/dashboard" className="text-frost-white hover:text-asgard-gold transition-all duration-300 tracking-widest relative group">
-                    <span className="relative z-10 group-hover:animate-glow-text">DASHBOARD</span>
-                    <div className="absolute -bottom-1 left-0 w-0 h-px bg-asgard-gold group-hover:w-full transition-all duration-300" />
-                </Link>
-
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-16 h-px bg-gradient-to-l from-transparent to-asgard-gold animate-rune-glow" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-16 h-px bg-gradient-to-l from-transparent to-asgard-gold animate-pulse" />
             </nav>
         </div>
     </header>
