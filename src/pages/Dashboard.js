@@ -1,39 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Shield from '../components/Shield';
 import Rune from '../components/Rune';
+import { connectWallet } from '../store/slices/walletSlice';
 
 const Dashboard = () => {
-    const [walletConnected, setWalletConnected] = useState(false);
-    const [walletTokens, setWalletTokens] = useState([]);
-    const [showHistory, setShowHistory] = useState(false);
-
-    const mockTokens = [
-        {
-            name: "Ethereum",
-            symbol: "ETH",
-            balance: "1.234",
-            value: 2468.12,
-            change24h: 5.2,
-            history: [2350, 2400, 2380, 2420, 2468]
-        },
-        {
-            name: "Hammer Token",
-            symbol: "HAMR",
-            balance: "456.789",
-            value: 789.45,
-            change24h: -2.1,
-            history: [800, 785, 790, 782, 789]
-        }
-    ];
-
-    const mockTransactions = [
-        { type: 'RECEIVE', token: 'ETH', amount: '1.0', from: '0x1234...5678', timestamp: '2024-03-20 09:15' },
-        { type: 'SEND', token: 'HAMR', amount: '50.0', to: '0x8765...4321', timestamp: '2024-03-19 15:30' }
-    ];
+    const dispatch = useDispatch();
+    const { isConnected, tokens, transactions, loading } = useSelector(state => state.wallet);
 
     const handleConnectWallet = () => {
-        setWalletConnected(true);
-        setWalletTokens(mockTokens);
+        dispatch(connectWallet());
     };
 
     return (
@@ -41,27 +17,29 @@ const Dashboard = () => {
             <Shield
                 title="CONNECT TO RÚNSKRIN"
                 variant="gold"
-                className={`mb-8 ${walletConnected ? 'border-asgard-gold' : 'border-bifrost-teal'}`}
+                className={`mb-8 ${isConnected ? 'border-asgard-gold' : 'border-bifrost-teal'}`}
             >
                 <div className="flex flex-col items-center gap-4">
                     <p className="text-center mb-4">
-                        {walletConnected
+                        {isConnected
                             ? "Your wallet is connected to the realms of Valhalla"
                             : "Connect your wallet to begin your ascension"}
                     </p>
                     <Rune
-                        variant={walletConnected ? "secondary" : "primary"}
+                        variant={isConnected ? "secondary" : "primary"}
                         onClick={handleConnectWallet}
+                        disabled={loading.connection}
                     >
-                        {walletConnected ? "WALLET CONNECTED" : "CONNECT WALLET"}
+                        {loading.connection ? "CONNECTING..." :
+                            isConnected ? "WALLET CONNECTED" : "CONNECT WALLET"}
                     </Rune>
                 </div>
             </Shield>
 
-            {walletConnected && (
+            {isConnected && (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                        {walletTokens.map((token, index) => (
+                        {tokens.map((token, index) => (
                             <Shield
                                 key={index}
                                 title={token.name}
@@ -90,7 +68,7 @@ const Dashboard = () => {
 
                     <div className="grid md:grid-cols-2 gap-6">
                         <Shield title="RECENT ACTIVITY" variant="frost">
-                            {mockTransactions.map((tx, index) => (
+                            {transactions.map((tx, index) => (
                                 <div key={index} className="flex items-center justify-between p-3 border-b border-frost-white/20">
                                     <div className="flex items-center gap-3">
                                         <span className="text-asgard-gold">
@@ -117,15 +95,19 @@ const Dashboard = () => {
                             <div className="space-y-4">
                                 <div className="flex justify-between">
                                     <span className="text-frost-white">Total Value:</span>
-                                    <span className="text-asgard-gold">$3,257.57</span>
+                                    <span className="text-asgard-gold">
+                                        ${tokens.reduce((sum, token) => sum + token.value, 0).toFixed(2)}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-frost-white">24h Change:</span>
-                                    <span className="text-green-400">+3.1%</span>
+                                    <span className={`${tokens.reduce((sum, token) => sum + token.change24h, 0) / tokens.length >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                        {(tokens.reduce((sum, token) => sum + token.change24h, 0) / tokens.length).toFixed(1)}%
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-frost-white">Number of Assets:</span>
-                                    <span className="text-frost-white">2</span>
+                                    <span className="text-frost-white">{tokens.length}</span>
                                 </div>
                             </div>
                         </Shield>
