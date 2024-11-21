@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook
+import { useNavigate } from 'react-router-dom';
 import Shield from '../components/Shield';
 
 const TransitionText = ({ runic, english, className = "" }) => {
@@ -67,11 +67,19 @@ const ShieldTitle = ({ runic, english }) => (
     </div>
 );
 
+const ComingSoonBadge = () => (
+    <div className="absolute top-2 right-2">
+        <span className="bg-[#ffd700] text-[#1a2333] text-xs font-bold px-2 py-1 rounded-full">
+            Coming Soon
+        </span>
+    </div>
+);
+
 const Home = () => {
-    const navigate = useNavigate(); // Initialize the navigate function
+    const navigate = useNavigate();
 
     const handleBeginPathClick = () => {
-        navigate('/dashboard'); // Navigate to the Dashboard route
+        navigate('/dashboard');
     };
 
     return (
@@ -98,7 +106,7 @@ const Home = () => {
                             runic="ᛒᛖᚷᛁᚾ ᛃᛟᚢᚱ ᛈᚨᚦ"
                             english="BEGIN YOUR PATH"
                             variant="primary"
-                            onClick={handleBeginPathClick} // Navigate on click
+                            onClick={handleBeginPathClick}
                         />
                         <RunicButton
                             runic="ᛚᛖᚨᚱᚾ ᚦᛖ ᛋᚨᚷᚨᛋ"
@@ -113,8 +121,9 @@ const Home = () => {
                 <Shield
                     title={<ShieldTitle runic="ᛋᛏᚨᚲᛁᛜ" english="STAKING" />}
                     variant="gold"
-                    className="transform hover:scale-105 transition-transform"
+                    className="transform hover:scale-105 transition-transform relative"
                 >
+                    <ComingSoonBadge />
                     <div className="text-center space-y-4">
                         <span className="text-4xl">⚔️</span>
                         <p className="tracking-wider">Stake your tokens in our divine pools and earn rewards worthy of Odin's favor</p>
@@ -124,8 +133,9 @@ const Home = () => {
                 <Shield
                     title={<ShieldTitle runic="ᚲᚹᛖᛋᛏᛋ" english="QUESTS" />}
                     variant="frost"
-                    className="transform hover:scale-105 transition-transform"
+                    className="transform hover:scale-105 transition-transform relative"
                 >
+                    <ComingSoonBadge />
                     <div className="text-center space-y-4">
                         <span className="text-4xl">🛡️</span>
                         <p className="tracking-wider">Complete daily challenges to earn exclusive rewards and rise through the ranks</p>
@@ -135,8 +145,9 @@ const Home = () => {
                 <Shield
                     title={<ShieldTitle runic="ᚻᚨᛚᛚᛋ" english="HALLS" />}
                     variant="default"
-                    className="transform hover:scale-105 transition-transform"
+                    className="transform hover:scale-105 transition-transform relative"
                 >
+                    <ComingSoonBadge />
                     <div className="text-center space-y-4">
                         <span className="text-4xl">👑</span>
                         <p className="tracking-wider">Compete with fellow warriors for a place in our eternal leaderboards</p>
