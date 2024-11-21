@@ -4,9 +4,9 @@ const Shield = ({
                     children,
                     title,
                     variant = 'default',
-                    className = ''
+                    className = '',
+                    ...props
                 }) => {
-    // Norse-themed color variants
     const variants = {
         default: 'from-[#1a2333] to-[#2a3142] border-[#40E0D0]',
         gold: 'from-[#2a3142] to-[#1a2333] border-[#ffd700]',
@@ -14,16 +14,19 @@ const Shield = ({
     };
 
     return (
-        <div className={`
-      relative 
-      p-6 
-      rounded-lg 
-      overflow-hidden
-      transition-all 
-      duration-300 
-      hover:shadow-lg
-      ${className}
-    `}>
+        <div
+            className={`
+                relative 
+                p-6 
+                rounded-lg 
+                overflow-hidden
+                transition-all 
+                duration-300 
+                hover:shadow-lg
+                ${className}
+            `}
+            {...props}
+        >
             {/* Gradient background with Norse pattern overlay */}
             <div className={`
         absolute 

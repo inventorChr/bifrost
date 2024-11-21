@@ -1,7 +1,6 @@
-// Action buttons
 import React from 'react';
 
-const Rune = ({ children, onClick, variant = 'primary' }) => {
+const Rune = ({ children, onClick, variant = 'primary', className = '', ...props }) => {
     const baseStyles = "relative overflow-hidden font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105";
 
     const variants = {
@@ -11,8 +10,9 @@ const Rune = ({ children, onClick, variant = 'primary' }) => {
 
     return (
         <button
-            className={`${baseStyles} ${variants[variant]} group`}
+            className={`${baseStyles} ${variants[variant]} group ${className}`}
             onClick={onClick}
+            {...props}  // This will pass through data-testid and other props
         >
             <span className="relative z-10">{children}</span>
             <div className="absolute inset-0 bg-[#ffd700] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
