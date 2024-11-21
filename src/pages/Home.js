@@ -1,37 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Shield from '../components/Shield';
-
-const TransitionText = ({ runic, english, className = "" }) => {
-    const [showRunic, setShowRunic] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setShowRunic(false);
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, []);
-
-    return (
-        <div className={`relative ${className}`}>
-            <span
-                className={`absolute top-0 left-0 right-0 transition-all duration-1000 ${
-                    showRunic ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-                }`}
-            >
-                {runic}
-            </span>
-            <span
-                className={`absolute top-0 left-0 right-0 transition-all duration-1000 ${
-                    showRunic ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
-                }`}
-            >
-                {english}
-            </span>
-            <span className="opacity-0">{english}</span>
-        </div>
-    );
-};
+import TransitionText from '../components/TransitionText';
 
 const RunicButton = ({ runic, english, onClick, variant = "primary" }) => {
     const baseStyles = "relative overflow-hidden font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 min-w-[200px] text-center";
