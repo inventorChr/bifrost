@@ -20,13 +20,22 @@
   "description": "",
   "dependencies": {
     "@reduxjs/toolkit": "^2.3.0",
+    "@tanstack/react-query": "^5.61.0",
+    "@wagmi/connectors": "^5.5.0",
+    "glob": "^11.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",
-    "react-router-dom": "^6.22.0"
+    "react-router-dom": "^6.22.0",
+    "rimraf": "^6.0.1",
+    "viem": "^2.21.49",
+    "wagmi": "^2.13.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@babel/plugin-transform-class-properties": "^7.25.9",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.25.9",
+    "@babel/plugin-transform-optional-chaining": "^7.25.9",
     "@babel/preset-env": "^7.24.0",
     "@babel/preset-react": "^7.23.3",
     "@testing-library/jest-dom": "^6.4.2",
