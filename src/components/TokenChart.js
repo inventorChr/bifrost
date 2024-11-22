@@ -13,9 +13,17 @@ const TokenChart = ({ data = [], change24h = 0 }) => {
     // Convert all prices to numbers and determine the scale
     const prices = data.map(price => Number(price));
     const maxPrice = Math.max(...prices);
+    const minPrice = Math.min(...prices);
 
-    // Determine if we're dealing with very small numbers
-    const isSmallNumber = maxPrice < 0.01;
+    // Determine if we're dealing with very small numbers and calculate appropriate scale
+    const isSmallNumber = maxPrice < 1;
+    const priceDifference = maxPrice - minPrice;
+    const priceRange = priceDifference === 0 ? maxPrice * 0.1 : priceDifference;
+
+    // Calculate dynamic padding based on price range
+    const paddingFactor = isSmallNumber ? 0.001 : 0.005;
+    const yMin = Math.max(0, minPrice - (priceRange * paddingFactor));
+    const yMax = maxPrice + (priceRange * paddingFactor);
 
     // Generate time points for the last 24 hours
     const chartData = data.slice(-24).map((price, i) => ({
@@ -26,19 +34,31 @@ const TokenChart = ({ data = [], change24h = 0 }) => {
         price: Number(price)
     }));
 
-    // Calculate min and max with padding
-    const minPrice = Math.min(...prices) * 0.995;
-    const maxPriceWithPadding = maxPrice * 1.005;
+    // Determine optimal decimal places based on price magnitude
+    const getDecimalPlaces = (value) => {
+        if (value === 0) return 2;
+        const log10 = Math.floor(Math.log10(Math.abs(value)));
+        if (log10 >= 0) return 2;
+        return Math.min(Math.abs(log10) + 2, 8);
+    };
 
     // Format tooltip value based on price magnitude
     const formatTooltipValue = (value) => {
-        const num = Number(value);
-        if (isSmallNumber) {
-            return `$${num.toExponential(6)}`;
-        }
-        return `$${num.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 8
+        if (value === 0) return '$0.00';
+        const decimalPlaces = getDecimalPlaces(value);
+        return `$${value.toLocaleString(undefined, {
+            minimumFractionDigits: decimalPlaces,
+            maximumFractionDigits: decimalPlaces
+        })}`;
+    };
+
+    // Format Y-axis ticks
+    const formatYAxis = (value) => {
+        if (value === 0) return '$0';
+        const decimalPlaces = getDecimalPlaces(value);
+        return `$${value.toLocaleString(undefined, {
+            minimumFractionDigits: decimalPlaces,
+            maximumFractionDigits: decimalPlaces
         })}`;
     };
 
@@ -57,10 +77,13 @@ const TokenChart = ({ data = [], change24h = 0 }) => {
                         tickFormatter={(time) => time.split(':')[0]}
                     />
                     <YAxis
-                        domain={[minPrice, maxPriceWithPadding]}
-                        hide={true}
-                        scale="log"
-                        allowDataOverflow={true}
+                        domain={[yMin, yMax]}
+                        scale="linear"
+                        tick={{ fill: '#e6f1ff', fontSize: 10 }}
+                        tickFormatter={formatYAxis}
+                        width={60}
+                        allowDataOverflow={false}
+                        tickCount={5}
                     />
                     <Tooltip
                         contentStyle={{
