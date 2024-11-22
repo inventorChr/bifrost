@@ -1,52 +1,140 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useWallet } from '../hooks/useWallet';
+import { useCoinGeckoTokens } from '../hooks/useCoinGeckoTokens';
+import TokenChart from "../components/TokenChart";
 import Shield from '../components/Shield';
 import Rune from '../components/Rune';
 import TransitionText from '../components/TransitionText';
-import { mockTokens, mockTransactions } from '../store/mockData';
 
-const TokenCard = ({ token }) => (
-    <Shield
-        title={token.name}
-        variant="frost"
-        className="relative"
-        data-testid={`token-card-${token.symbol}`}
-    >
-        <div className="flex justify-between items-center mb-4">
-            <div>
-                <p className="text-xl font-bold text-asgard-gold" data-testid={`token-symbol-${token.symbol}`}>
-                    {token.symbol}
-                </p>
-                <p className="text-lg text-frost-white" data-testid={`token-balance-${token.symbol}`}>
-                    {token.balance}
-                </p>
+const TokenCard = ({ token }) => {
+    // Early return with loading state if token is empty
+    if (!token) {
+        return (
+            <Shield
+                title="Loading..."
+                variant="frost"
+                className="relative"
+            >
+                <div className="animate-pulse">Loading token data...</div>
+            </Shield>
+        );
+    }
+
+    // Validate and format token data with fallbacks
+    const {
+        name = 'Unknown Token',
+        symbol = '',
+        balance = '0',
+        price = '0',
+        value = '0',
+        change24h = '0',
+        logo = '',
+        history = []
+    } = token;
+
+    // Format numerical values with proper parsing
+    const formattedBalance = parseFloat(balance).toLocaleString(undefined, {
+        maximumFractionDigits: 4
+    });
+
+    const formattedPrice = parseFloat(price).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+    });
+
+    const formattedValue = parseFloat(value).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    const formattedChange = parseFloat(change24h).toFixed(2);
+    const isPositiveChange = parseFloat(change24h) >= 0;
+
+    // Debug logging
+    console.log('TokenCard Render:', {
+        name,
+        symbol,
+        balance: formattedBalance,
+        price: formattedPrice,
+        value: formattedValue,
+        change24h: formattedChange
+    });
+
+    return (
+        <Shield
+            title={name}
+            variant="frost"
+            className="relative"
+            data-testid={`token-card-${symbol}`}
+        >
+            <div className="flex justify-between items-start mb-4">
+                <div>
+                    <p className="text-xl font-bold text-asgard-gold" data-testid={`token-symbol-${symbol}`}>
+                        {symbol}
+                    </p>
+                    <p className="text-lg text-frost-white" data-testid={`token-balance-${symbol}`}>
+                        {formattedBalance} {symbol}
+                    </p>
+                </div>
+                <div className="text-right">
+                    <p className="text-sm text-frost-white/70 mb-1">Price per token:</p>
+                    <p className="text-lg text-frost-white" data-testid={`token-price-${symbol}`}>
+                        ${formattedPrice}
+                    </p>
+                    <p className="text-sm text-frost-white/70 mt-2 mb-1">Total Value:</p>
+                    <p className="text-lg text-frost-white" data-testid={`token-value-${symbol}`}>
+                        ${formattedValue}
+                    </p>
+                    <p
+                        className={`text-sm ${isPositiveChange ? 'text-green-400' : 'text-red-400'}`}
+                        data-testid={`token-change-${symbol}`}
+                    >
+                        {isPositiveChange ? '+' : ''}{formattedChange}%
+                    </p>
+                </div>
             </div>
-            <div className="text-right">
-                <p className="text-lg text-frost-white" data-testid={`token-value-${token.symbol}`}>
-                    ${token.value}
-                </p>
-                <p
-                    className={`text-sm ${token.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}
-                    data-testid={`token-change-${token.symbol}`}
+
+            {logo && (
+                <img
+                    src={logo}
+                    alt={`${symbol} logo`}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-full"
+                    onError={(e) => {
+                        e.target.style.display = 'none';
+                    }}
+                />
+            )}
+
+            {history && history.length > 0 && (
+                <TokenChart
+                    data={history}
+                    change24h={parseFloat(change24h)}
+                />
+            )}
+
+            <div className="flex justify-center gap-4 mt-4">
+                <Rune
+                    variant="secondary"
+                    className="w-32"
+                    data-testid={`send-button-${symbol}`}
                 >
-                    {token.change24h}%
-                </p>
+                    Send
+                </Rune>
+                <Rune
+                    variant="secondary"
+                    className="w-32"
+                    data-testid={`receive-button-${symbol}`}
+                >
+                    Receive
+                </Rune>
             </div>
-        </div>
-        <div className="flex justify-center gap-4 mt-4">
-            <Rune variant="secondary" className="w-32" data-testid={`send-button-${token.symbol}`}>
-                Send
-            </Rune>
-            <Rune variant="secondary" className="w-32" data-testid={`receive-button-${token.symbol}`}>
-                Receive
-            </Rune>
-        </div>
-    </Shield>
-);
+        </Shield>
+    );
+};
 
-const RecentActivity = ({ transactions }) => (
+const RecentActivity = ({ transactions = [] }) => (
     <Shield title="RECENT ACTIVITY" variant="frost" data-testid="recent-activity">
-        {transactions.map((tx, index) => (
+        {transactions.length > 0 ? transactions.map((tx, index) => (
             <div
                 key={index}
                 className="flex items-center justify-between p-3 border-b border-frost-white/20"
@@ -70,26 +158,30 @@ const RecentActivity = ({ transactions }) => (
                     </p>
                 </div>
             </div>
-        ))}
+        )) : (
+            <div className="text-center text-frost-white/70 py-4">
+                No recent transactions
+            </div>
+        )}
     </Shield>
 );
 
-const PortfolioSummary = ({ tokens }) => (
+const PortfolioSummary = ({ tokens = [] }) => (
     <Shield title="PORTFOLIO SUMMARY" variant="frost" data-testid="portfolio-summary">
         <div className="space-y-4">
             <div className="flex justify-between">
                 <span className="text-frost-white">Total Value:</span>
                 <span className="text-asgard-gold" data-testid="total-value">
-                    ${tokens.reduce((sum, token) => sum + token.value, 0).toFixed(2)}
+                    ${tokens.reduce((sum, token) => sum + parseFloat(token.value || 0), 0).toFixed(2)}
                 </span>
             </div>
             <div className="flex justify-between">
                 <span className="text-frost-white">24h Change:</span>
                 <span
-                    className={`${tokens.reduce((sum, token) => sum + token.change24h, 0) / tokens.length >= 0 ? 'text-green-400' : 'text-red-400'}`}
+                    className={`${tokens.length > 0 && (tokens.reduce((sum, token) => sum + (parseFloat(token.change24h) || 0), 0) / tokens.length) >= 0 ? 'text-green-400' : 'text-red-400'}`}
                     data-testid="total-change"
                 >
-                    {(tokens.reduce((sum, token) => sum + token.change24h, 0) / tokens.length).toFixed(1)}%
+                    {tokens.length > 0 ? (tokens.reduce((sum, token) => sum + (parseFloat(token.change24h) || 0), 0) / tokens.length).toFixed(2) : '0.00'}%
                 </span>
             </div>
             <div className="flex justify-between">
@@ -108,40 +200,10 @@ const Dashboard = () => {
         connect,
         disconnect,
         chain,
-        balance,
         isMetaMaskInstalled
     } = useWallet();
 
-    // Add debugging logs
-    useEffect(() => {
-        console.log('Wallet state:', {
-            isConnected,
-            isConnecting,
-            address,
-            chain,
-            isMetaMaskInstalled
-        });
-    }, [isConnected, isConnecting, address, chain, isMetaMaskInstalled]);
-
-    const handleConnect = async () => {
-        try {
-            if (!isMetaMaskInstalled) {
-                window.open('https://metamask.io', '_blank');
-                return;
-            }
-            await connect();
-        } catch (error) {
-            console.error('Connection error:', error);
-        }
-    };
-
-    const handleDisconnect = async () => {
-        try {
-            await disconnect();
-        } catch (error) {
-            console.error('Disconnect error:', error);
-        }
-    };
+    const { tokens, isLoading, error, refetch, isMockData } = useCoinGeckoTokens();
 
     if (!isMetaMaskInstalled) {
         return (
@@ -193,17 +255,9 @@ const Dashboard = () => {
                                 <p className="text-sm text-frost-white/70">Network</p>
                                 <p className="text-bifrost-teal">{chain?.name || 'Unknown'}</p>
                             </div>
-                            {balance && (
-                                <div className="text-center">
-                                    <p className="text-sm text-frost-white/70">Balance</p>
-                                    <p className="text-asgard-gold">
-                                        {`${parseFloat(balance?.formatted || '0').toFixed(4)} ${balance?.symbol || 'ETH'}`}
-                                    </p>
-                                </div>
-                            )}
                             <Rune
                                 variant="secondary"
-                                onClick={handleDisconnect}
+                                onClick={disconnect}
                                 className="mt-4"
                             >
                                 DISCONNECT
@@ -216,7 +270,7 @@ const Dashboard = () => {
                             </p>
                             <Rune
                                 variant="primary"
-                                onClick={handleConnect}
+                                onClick={connect}
                                 disabled={isConnecting}
                             >
                                 {isConnecting ? "CONNECTING..." : "CONNECT WALLET"}
@@ -228,16 +282,58 @@ const Dashboard = () => {
 
             {isConnected && (
                 <>
+                    {isMockData && (
+                        <Shield variant="frost" className="mb-6">
+                            <div className="text-bifrost-teal p-4 flex items-center justify-between">
+                                <span>🔧 Using mock token data for development</span>
+                                <Rune
+                                    variant="secondary"
+                                    className="ml-4"
+                                    onClick={refetch}
+                                >
+                                    Refresh
+                                </Rune>
+                            </div>
+                        </Shield>
+                    )}
+
+                    {error && !isMockData && (
+                        <Shield variant="frost" className="mb-6">
+                            <div className="text-red-400 p-4 flex items-center justify-between">
+                                <span>Error loading tokens: {error}</span>
+                                <Rune
+                                    variant="secondary"
+                                    className="ml-4"
+                                    onClick={refetch}
+                                >
+                                    Retry
+                                </Rune>
+                            </div>
+                        </Shield>
+                    )}
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                        {mockTokens.map((token, index) => (
-                            <TokenCard key={index} token={token} />
-                        ))}
+                        {isLoading ? (
+                            <div className="col-span-full text-center text-frost-white">
+                                <div className="animate-pulse">Loading tokens...</div>
+                            </div>
+                        ) : tokens.length > 0 ? (
+                            tokens.map((token, index) => (
+                                <TokenCard key={`${token.symbol}-${index}`} token={token} />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center text-frost-white">
+                                No tokens found in this wallet
+                            </div>
+                        )}
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <RecentActivity transactions={mockTransactions} />
-                        <PortfolioSummary tokens={mockTokens} />
-                    </div>
+                    {tokens.length > 0 && (
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <RecentActivity transactions={[]} />
+                            <PortfolioSummary tokens={tokens} />
+                        </div>
+                    )}
                 </>
             )}
         </div>
