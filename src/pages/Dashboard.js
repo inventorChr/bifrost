@@ -172,50 +172,55 @@ const WalletSummaryLayout = ({
                                  disconnect,
                                  tokens = []
                              }) => {
+    // Calculate portfolio metrics
     const totalValue = tokens.reduce((sum, token) => sum + parseFloat(token.value || 0), 0);
     const averageChange = tokens.length > 0
         ? tokens.reduce((sum, token) => sum + (parseFloat(token.change24h) || 0), 0) / tokens.length
         : 0;
 
+    // Calculate highest and lowest performing assets
+    const sortedByChange = [...tokens].sort((a, b) => parseFloat(b.change24h) - parseFloat(a.change24h));
+    const bestPerformer = sortedByChange[0];
+    const worstPerformer = sortedByChange[sortedByChange.length - 1];
+
+    // Calculate largest holdings
+    const sortedByValue = [...tokens].sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+    const largestHolding = sortedByValue[0];
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 mb-8">
             <Shield
                 variant="gold"
-                className="h-full flex flex-col justify-between"
+                className="h-full p-4 flex justify-center items-center"
             >
-                <div className="flex flex-col items-center p-4 flex-grow">
-                    <div className="text-center mb-4">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="text-center">
                         <p className="text-sm text-frost-white/70">Connected Account</p>
-                        <p className="text-asgard-gold">
-                            {`${address.slice(0, 6)}...${address.slice(-4)}`}
-                        </p>
+                        <p className="text-asgard-gold">{`${address.slice(0, 6)}...${address.slice(-4)}`}</p>
                     </div>
-                    <div className="text-center mb-4">
+                    <div className="text-center">
                         <p className="text-sm text-frost-white/70">Network</p>
                         <p className="text-bifrost-teal">{chain?.name || 'Unknown'}</p>
                     </div>
-                    <div className="mt-auto">
-                        <Rune
-                            variant="secondary"
-                            onClick={disconnect}
-                            className="px-8"
-                        >
-                            DISCONNECT
-                        </Rune>
-                    </div>
+                    <Rune variant="secondary" onClick={disconnect} className="px-6">
+                        DISCONNECT
+                    </Rune>
                 </div>
             </Shield>
 
             <Shield
-                title="PORTFOLIO"
+                title="PORTFOLIO ANALYTICS"
                 variant="frost"
-                className="h-full"
+                className="h-fit"
             >
-                <div className="flex flex-col justify-between h-full p-4">
-                    <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                    <div className="space-y-3">
+                        <h3 className="text-asgard-gold font-semibold mb-2">Overview</h3>
                         <div className="flex justify-between">
                             <span className="text-frost-white">Total Value:</span>
-                            <span className="text-asgard-gold">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="text-asgard-gold">
+                ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-frost-white">24h Change:</span>
@@ -224,9 +229,37 @@ const WalletSummaryLayout = ({
               </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-frost-white">Assets:</span>
+                            <span className="text-frost-white">Total Assets:</span>
                             <span className="text-frost-white">{tokens.length}</span>
                         </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <h3 className="text-asgard-gold font-semibold mb-2">Performance</h3>
+                        {bestPerformer && (
+                            <div className="flex justify-between">
+                                <span className="text-frost-white">Best Performer:</span>
+                                <span className="text-green-400">
+                  {bestPerformer.symbol} ({parseFloat(bestPerformer.change24h).toFixed(2)}%)
+                </span>
+                            </div>
+                        )}
+                        {worstPerformer && (
+                            <div className="flex justify-between">
+                                <span className="text-frost-white">Worst Performer:</span>
+                                <span className="text-red-400">
+                  {worstPerformer.symbol} ({parseFloat(worstPerformer.change24h).toFixed(2)}%)
+                </span>
+                            </div>
+                        )}
+                        {largestHolding && (
+                            <div className="flex justify-between">
+                                <span className="text-frost-white">Largest Holding:</span>
+                                <span className="text-bifrost-teal">
+                  {largestHolding.symbol} (${parseFloat(largestHolding.value).toLocaleString()})
+                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </Shield>
