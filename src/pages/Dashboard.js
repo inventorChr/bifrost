@@ -166,31 +166,73 @@ const RecentActivity = ({ transactions = [] }) => (
     </Shield>
 );
 
-const PortfolioSummary = ({ tokens = [] }) => (
-    <Shield title="PORTFOLIO SUMMARY" variant="frost" data-testid="portfolio-summary">
-        <div className="space-y-4">
-            <div className="flex justify-between">
-                <span className="text-frost-white">Total Value:</span>
-                <span className="text-asgard-gold" data-testid="total-value">
-                    ${tokens.reduce((sum, token) => sum + parseFloat(token.value || 0), 0).toFixed(2)}
-                </span>
-            </div>
-            <div className="flex justify-between">
-                <span className="text-frost-white">24h Change:</span>
-                <span
-                    className={`${tokens.length > 0 && (tokens.reduce((sum, token) => sum + (parseFloat(token.change24h) || 0), 0) / tokens.length) >= 0 ? 'text-green-400' : 'text-red-400'}`}
-                    data-testid="total-change"
-                >
-                    {tokens.length > 0 ? (tokens.reduce((sum, token) => sum + (parseFloat(token.change24h) || 0), 0) / tokens.length).toFixed(2) : '0.00'}%
-                </span>
-            </div>
-            <div className="flex justify-between">
-                <span className="text-frost-white">Number of Assets:</span>
-                <span className="text-frost-white" data-testid="asset-count">{tokens.length}</span>
-            </div>
+const WalletSummaryLayout = ({
+                                 address,
+                                 chain,
+                                 disconnect,
+                                 tokens = []
+                             }) => {
+    const totalValue = tokens.reduce((sum, token) => sum + parseFloat(token.value || 0), 0);
+    const averageChange = tokens.length > 0
+        ? tokens.reduce((sum, token) => sum + (parseFloat(token.change24h) || 0), 0) / tokens.length
+        : 0;
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Shield
+                variant="gold"
+                className="h-full flex flex-col justify-between"
+            >
+                <div className="flex flex-col items-center p-4 flex-grow">
+                    <div className="text-center mb-4">
+                        <p className="text-sm text-frost-white/70">Connected Account</p>
+                        <p className="text-asgard-gold">
+                            {`${address.slice(0, 6)}...${address.slice(-4)}`}
+                        </p>
+                    </div>
+                    <div className="text-center mb-4">
+                        <p className="text-sm text-frost-white/70">Network</p>
+                        <p className="text-bifrost-teal">{chain?.name || 'Unknown'}</p>
+                    </div>
+                    <div className="mt-auto">
+                        <Rune
+                            variant="secondary"
+                            onClick={disconnect}
+                            className="px-8"
+                        >
+                            DISCONNECT
+                        </Rune>
+                    </div>
+                </div>
+            </Shield>
+
+            <Shield
+                title="PORTFOLIO"
+                variant="frost"
+                className="h-full"
+            >
+                <div className="flex flex-col justify-between h-full p-4">
+                    <div className="space-y-4">
+                        <div className="flex justify-between">
+                            <span className="text-frost-white">Total Value:</span>
+                            <span className="text-asgard-gold">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-frost-white">24h Change:</span>
+                            <span className={averageChange >= 0 ? 'text-green-400' : 'text-red-400'}>
+                {averageChange.toFixed(2)}%
+              </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-frost-white">Assets:</span>
+                            <span className="text-frost-white">{tokens.length}</span>
+                        </div>
+                    </div>
+                </div>
+            </Shield>
         </div>
-    </Shield>
-);
+    );
+};
 
 const Dashboard = () => {
     const {
@@ -234,54 +276,37 @@ const Dashboard = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <Shield
-                title={
-                    <TransitionText
-                        runic="ᚹᚨᛚᛚᛖᛏ ᚲᛟᚾᚾᛖᚲᛏᛁᛟᚾ"
-                        english="WALLET CONNECTION"
-                    />
-                }
-                variant={isConnected ? "gold" : "frost"}
-                className="mb-8"
-            >
-                <div className="flex flex-col items-center gap-4">
-                    {isConnected && address ? (
-                        <>
-                            <div className="text-center">
-                                <p className="text-sm text-frost-white/70">Connected Account</p>
-                                <p className="text-asgard-gold">{`${address.slice(0, 6)}...${address.slice(-4)}`}</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-sm text-frost-white/70">Network</p>
-                                <p className="text-bifrost-teal">{chain?.name || 'Unknown'}</p>
-                            </div>
-                            <Rune
-                                variant="secondary"
-                                onClick={disconnect}
-                                className="mt-4"
-                            >
-                                DISCONNECT
-                            </Rune>
-                        </>
-                    ) : (
-                        <>
-                            <p className="text-center">
-                                Connect your MetaMask to enter the realm of digital Valhalla
-                            </p>
-                            <Rune
-                                variant="primary"
-                                onClick={connect}
-                                disabled={isConnecting}
-                            >
-                                {isConnecting ? "CONNECTING..." : "CONNECT WALLET"}
-                            </Rune>
-                        </>
-                    )}
-                </div>
-            </Shield>
-
-            {isConnected && (
+            {!isConnected ? (
+                <Shield
+                    title={
+                        <TransitionText
+                            runic="ᚹᚨᛚᛚᛖᛏ ᚲᛟᚾᚾᛖᚲᛏᛁᛟᚾ"
+                            english="WALLET CONNECTION"
+                        />
+                    }
+                    variant="frost"
+                    className="mb-8"
+                >
+                    <div className="text-center">
+                        <p className="mb-4">Connect your MetaMask to enter the realm of digital Valhalla</p>
+                        <Rune
+                            variant="primary"
+                            onClick={connect}
+                            disabled={isConnecting}
+                        >
+                            {isConnecting ? "CONNECTING..." : "CONNECT WALLET"}
+                        </Rune>
+                    </div>
+                </Shield>
+            ) : (
                 <>
+                    <WalletSummaryLayout
+                        address={address}
+                        chain={chain}
+                        disconnect={disconnect}
+                        tokens={tokens}
+                    />
+
                     {isMockData && (
                         <Shield variant="frost" className="mb-6">
                             <div className="text-bifrost-teal p-4 flex items-center justify-between">
@@ -331,7 +356,6 @@ const Dashboard = () => {
                     {tokens.length > 0 && (
                         <div className="grid md:grid-cols-2 gap-6">
                             <RecentActivity transactions={[]} />
-                            <PortfolioSummary tokens={tokens} />
                         </div>
                     )}
                 </>
